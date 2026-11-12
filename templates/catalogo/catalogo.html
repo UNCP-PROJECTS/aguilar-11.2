@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Catálogo de Productos | UNCP FIS{% endblock %}
+
+{% block content %}
+<style>
+    .catalog-header {
+        margin-bottom: 1.5rem;
+    }
+    .catalog-header h2 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+    .catalog-header p {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+    }
+    .filter-bar {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1rem 1.25rem;
+        margin-bottom: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .search-box {
+        display: flex;
+        gap: 0.5rem;
+        flex: 1;
+        min-width: 260px;
+    }
+    .search-input {
+        width: 100%;
+        padding: 0.55rem 0.85rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    .search-input:focus {
+        border-color: var(--primary-light);
+    }
+    .category-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .category-pill {
+        display: inline-block;
+        padding: 0.4rem 0.85rem;
+        border-radius: 9999px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    .category-pill:hover, .category-pill.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+    .product-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1.25rem;
+        padding-top: 0.85rem;
+        border-top: 1px solid var(--border);
+    }
+    .empty-state {
+        grid-column: 1 / -1;
+        background: var(--surface);
+        border: 1px dashed var(--border);
+        border-radius: var(--radius);
+        padding: 3rem 1.5rem;
+        text-align: center;
+        color: var(--text-muted);
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2.5rem;
+    }
+    .page-link {
+        padding: 0.45rem 0.85rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text-main);
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    .page-link.current {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+</style>
+
+<div class="catalog-header">
+    <h2>Listado de Productos Tecnológicos</h2>
+    <p>Vista basada en clases (CBV ListView) con filtrado modular por categoría, búsqueda dinámica y control de stock.</p>
+</div>
+
+<form method="GET" action="{% url 'catalogo:catalogo' %}" class="filter-bar">
+    {% if categoria_actual %}
+    <input type="hidden" name="categoria" value="{{ categoria_actual }}">
+    {% endif %}
+    <div class="search-box">
+        <input type="text" name="q" value="{{ busqueda_actual }}" placeholder="Buscar por nombre o especificación..." class="search-input">
+        <button type="submit" class="btn">Buscar</button>
+        {% if busqueda_actual or categoria_actual or orden_actual %}
+        <a href="{% url 'catalogo:catalogo' %}" class="btn btn-outline">Limpiar</a>
+        {% endif %}
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <label for="orden-select" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Ordenar:</label>
+        <select id="orden-select" name="orden" onchange="this.form.submit()" style="padding: 0.5rem 0.75rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; outline: none;">
+            <option value="">Por defecto</option>
+            <option value="precio_asc" {% if orden_actual == 'precio_asc' %}selected{% endif %}>Precio: Menor a Mayor</option>
+            <option value="precio_desc" {% if orden_actual == 'precio_desc' %}selected{% endif %}>Precio: Mayor a Menor</option>
+        </select>
+    </div>
+</form>
+
+<div class="category-pills">
+    <a href="{% url 'catalogo:catalogo' %}{% if busqueda_actual %}?q={{ busqueda_actual }}{% endif %}" class="category-pill {% if not categoria_actual %}active{% endif %}">Todas las Categorías</a>
+    {% for cat in categorias %}
+    <a href="{% url 'catalogo:catalogo' %}?categoria={{ cat }}{% if busqueda_actual %}&q={{ busqueda_actual }}{% endif %}" class="category-pill {% if categoria_actual == cat %}active{% endif %}">{{ cat }}</a>
+    {% endfor %}
+</div>
+
+<div class="grid">
+    {% for producto in productos %}
+    <div class="card">
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span class="badge badge-cat">{{ producto.categoria }}</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Ref #{{ producto.id }}</span>
+            </div>
+            <h3 style="font-size: 1.15rem; color: var(--text-main); margin-bottom: 0.5rem;">{{ producto.nombre|title }}</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.45;">{{ producto.descripcion|truncatewords:16 }}</p>
+        </div>
+        <div class="product-meta">
+            <div>
+                <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">Precio unitario</span>
+                <span style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">S/. {{ producto.precio|floatformat:2 }}</span>
+            </div>
+            <div>
+                {% if producto.stock == 0 %}
+                <span class="badge badge-out">Agotado</span>
+                {% else %}
+                <span class="badge badge-stock">En Stock: {{ producto.stock }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+        <h3 style="font-size: 1.2rem; color: var(--text-main); margin-bottom: 0.5rem;">No hay productos disponibles</h3>
+        <p>No se encontraron registros que coincidan con los criterios de filtrado seleccionados.</p>
+        <a href="{% url 'catalogo:catalogo' %}" class="btn btn-outline" style="margin-top: 1rem;">Restablecer filtros</a>
+    </div>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}{% if busqueda_actual %}&q={{ busqueda_actual }}{% endif %}" class="page-link">&laquo; Anterior</a>
+    {% endif %}
+
+    <span class="page-link current">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}{% if busqueda_actual %}&q={{ busqueda_actual }}{% endif %}" class="page-link">Siguiente &raquo;</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
