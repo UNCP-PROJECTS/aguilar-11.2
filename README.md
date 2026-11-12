@@ -48,7 +48,7 @@ El patrón MTV de Django desacopla responsabilidades delegando el ciclo solicitu
                  ▼  (5) Contexto inyectado (dict: 'productos', 'categorias')
   ┌─────────────────────────────────────────────────────────────┐
   │ 4. Motor de Templates (DTL)                                 │
-  │    base.html (Herencia DRY)  <──  catalogo/catalogo.html    │
+  │    base.html (Herencia DRY)  <──  catalogo.html             │
   └────────────────────────────┬────────────────────────────────┘
                                │
                                ▼  (6) HTTP Response 200 OK (HTML renderizado)
@@ -108,9 +108,8 @@ proyecto/
 │   └── img/logo-uncp.png
 ├── templates/                       # Plantillas DTL en Tema Claro (DreamDesign)
 │   ├── base.html                    # Shell institucional con navegación
-│   └── catalogo/
-│       ├── home.html                # Bienvenida y métricas (FBV)
-│       └── catalogo.html            # Catálogo con filtros y estados de stock (CBV)
+│   ├── catalogo.html                # Catálogo con filtros y estados de stock (CBV)
+│   └── home.html                    # Bienvenida y métricas (FBV)
 ├── .gitignore                       # Exclusión de .venv, db.sqlite3 y temporales
 ├── capture_browser.py               # Conector a Chromium/Chrome con Playwright
 ├── generate_evidence.py             # Generador de capturas CodeSnap con Pygments

@@ -17,16 +17,16 @@ def home(request):
         'valor_inventario': valor_inventario,
         'destacados': destacados,
     }
-    return render(request, 'catalogo/home.html', context)
+    return render(request, 'home.html', context)
 
 class ProductoListView(ListView):
     model = Producto
-    template_name = 'catalogo/catalogo.html'
+    template_name = 'catalogo.html'
     context_object_name = 'productos'
     paginate_by = 8
 
     def get_queryset(self):
-        queryset = Producto.objects.all()
+        queryset = Producto.objects.all().order_by('precio')
         categoria = self.request.GET.get('categoria')
         q = self.request.GET.get('q')
         orden = self.request.GET.get('orden')
@@ -35,10 +35,10 @@ class ProductoListView(ListView):
             queryset = queryset.filter(categoria=categoria)
         if q:
             queryset = queryset.filter(nombre__icontains=q)
-        if orden == 'precio_asc':
-            queryset = queryset.order_by('precio')
-        elif orden == 'precio_desc':
+        if orden == 'precio_desc':
             queryset = queryset.order_by('-precio')
+        elif orden == 'precio_asc':
+            queryset = queryset.order_by('precio')
         return queryset
 
     def get_context_data(self, **kwargs):

@@ -199,15 +199,15 @@
 <body>
     <header>
         <div class="nav-container">
-            <a href="{% url 'catalogo:home' %}" class="brand">
+            <a href="{% url 'home' %}" class="brand">
                 <img src="{% static 'img/logo-uncp.png' %}" alt="UNCP FIS Logo">
                 <span>Catálogo Tecnológico</span>
                 <span class="brand-badge">Django MTV</span>
             </a>
             <nav>
                 <ul>
-                    <li><a href="{% url 'catalogo:home' %}">Inicio</a></li>
-                    <li><a href="{% url 'catalogo:catalogo' %}">Catálogo Completo</a></li>
+                    <li><a href="{% url 'home' %}">Inicio</a></li>
+                    <li><a href="{% url 'catalogo' %}">Catálogo</a></li>
                     <li><a href="/admin/">Admin</a></li>
                 </ul>
             </nav>

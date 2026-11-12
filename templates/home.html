@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio | Catálogo Tecnológico UNCP{% endblock %}
+
+{% block content %}
+<style>
+    .hero {
+        background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 2.5rem 2rem;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+    .hero-text h1 {
+        font-size: 1.85rem;
+        color: var(--primary);
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+    }
+    .hero-text p {
+        color: var(--text-muted);
+        font-size: 1rem;
+        max-width: 600px;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+    .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+    }
+    .stat-card .label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+    }
+    .stat-card .val {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin-top: 0.4rem;
+    }
+    .section-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+    }
+    .section-title h2 {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+</style>
+
+<section class="hero">
+    <div class="hero-text">
+        <h1>Catálogo de Productos Tecnológicos</h1>
+        <p>Plataforma web con arquitectura Django MTV (Model-Template-View), enrutamiento reversible, vistas híbridas y persistencia relacional SQLite.</p>
+    </div>
+    <div>
+        <a href="{% url 'catalogo' %}" class="btn">Explorar Catálogo &rarr;</a>
+    </div>
+</section>
+
+<section class="stats-grid">
+    <div class="stat-card">
+        <div class="label">Total de Productos</div>
+        <div class="val">{{ total_productos }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Stock en Almacén</div>
+        <div class="val">{{ total_stock }} <span style="font-size: 1rem; font-weight: 500; color: var(--text-muted);">und.</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Valor Inventario</div>
+        <div class="val" style="color: var(--success-text);">S/. {{ valor_inventario|floatformat:2 }}</div>
+    </div>
+</section>
+
+<section>
+    <div class="section-title">
+        <h2>Productos Destacados</h2>
+        <a href="{% url 'catalogo' %}" style="text-decoration: none; color: var(--primary-light); font-weight: 600; font-size: 0.9rem;">Ver todos &rarr;</a>
+    </div>
+    <div class="grid">
+        {% for producto in destacados %}
+        <div class="card">
+            <div>
+                <span class="badge badge-cat">{{ producto.categoria }}</span>
+                <h3 style="margin-top: 0.65rem; font-size: 1.1rem; color: var(--text-main);">{{ producto.nombre|title }}</h3>
+                <p style="margin-top: 0.4rem; font-size: 0.88rem; color: var(--text-muted);">{{ producto.descripcion|truncatewords:12 }}</p>
+            </div>
+            <div style="margin-top: 1.2rem; display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid #f1f5f9; padding-top: 0.75rem;">
+                <span style="font-size: 1.2rem; font-weight: 800; color: var(--primary);">S/. {{ producto.precio|floatformat:2 }}</span>
+                <span class="badge badge-stock">Stock: {{ producto.stock }}</span>
+            </div>
+        </div>
+        {% empty %}
+        <p style="grid-column: 1 / -1; color: var(--text-muted); background: white; padding: 2rem; border-radius: var(--radius); text-align: center; border: 1px dashed var(--border);">No hay productos destacados disponibles.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
